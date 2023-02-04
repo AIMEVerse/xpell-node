@@ -1,0 +1,19 @@
+0.0.3
+--------
+- XEM - new event based system (XEvent)
+
+0.0.1
+---------
+
+- Xpell -  interpreter engine 
+- XLogger - system logger
+- XData - real-time random access memory (RAM) for storing variables and objects
+- XEventManager (XEM) - system based on HTML Custom Event
+- XCommand - xpell command
+- XModule - xpell base module - module wraps external engine like 3d engine, database, neural network...
+- XNanoCommands - module nano commands
+- XObject - wraps the module engine output object 
+- XObjectManager - module object manager
+- XParser - xpell parser
+- XUtils - utils library
+
