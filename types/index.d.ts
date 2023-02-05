@@ -17,7 +17,7 @@ export declare interface IXObjectData extends IXData_2 {
     id?: string | null
     _name?: string
     _type?: string
-    _children?: Array<XObject>
+    _children?: Array<IXObjectData>
     _xversion?: number 
 }
 
