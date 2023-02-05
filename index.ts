@@ -24,8 +24,10 @@ export {XParser} from "./src/XParser"
 export {XCommand} from "./src/XCommand"
 export {XLogger,XLogger as _xlog} from "./src/XLogger"
 export {XModule} from "./src/XModule"
-import IXObjectData from "./src/XObject"
-export {IXObjectData}
-export {XObject,XObjectPack} from "./src/XObject"
+// import type IXObjectData from "./src/XObject"
+// export {IXObjectData}
+export {XObject,XObjectPack,type IXObjectData} from "./src/XObject"
 export {XObjectManager} from "./src/XObjectManager"
-export {XEventManager, XEventManager as _xem} from "./src/XEventManager"
+export {XEventManager, XEventManager as _xem,type XEventListener} from "./src/XEventManager"
+// export type {XEventListener} from "./src/XEventManager"
+// export {XEventListener}

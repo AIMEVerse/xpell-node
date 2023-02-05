@@ -11,7 +11,7 @@ declare interface IXData_2 {
  * @interface IXObjectData
  * @param _xversion - minimum Xpell interpreter version (optional default value is 1.0)
  */
-declare interface IXObjectData_2 extends IXData_2 {
+export declare interface IXObjectData extends IXData_2 {
     [k: string]: string | null | [] | undefined | Function | boolean | number | {}
     _id?: string | null
     id?: string | null
@@ -61,6 +61,31 @@ export declare class XCommand {
  * @property 
  */
 export declare const XData = new XDataSource();
+
+/**
+ * XEventManager (_xem) is Xpell event system manager.
+ * This engine enables event dispatching and listening
+ * Usage: 
+ * 
+ * 1.Event Listen
+ *      // listen to event name "my-event" and display the event data to the console when fired
+ *      _xem.on("my-event",(eventName,data)=>{
+ *          console.log("XEM Event " + eventName,data)
+ *      })
+ * 
+ * 2. Event Fire
+ *      //fire (trigger) event name "my-event" and simple object as data
+ *      _xem.fire("my-event",{_data_param:"my data"})
+ */
+
+
+
+/**
+ * This interface define the listener callable function (provided with "on" method)
+ */
+export declare interface XEventListener {
+    (eventName:string,data:any):void
+}
 
 declare const  XEventManager = new XEventDispatcher();
 export { XEventManager }
@@ -113,7 +138,7 @@ export declare class XModule {
      * @param data - The data of the new object (JSON)
      * @return {XObject|*}
      */
-    create(data:IXObjectData_2) {
+    create(data:IXObjectData) {
 
         let xObject:any;
         if (data.hasOwnProperty("_type")) {
@@ -283,7 +308,7 @@ declare type XNanoCommandPack = {
  * XObject class
  * @class XObject
  */
-declare class XObject implements IXObjectData_2 {
+export declare class XObject implements IXObjectData {
     [k: string]: string | null | [] | undefined | Function | boolean | number | {}
     _children: Array<XObject>
     private _nano_commands:{[k:string]:Function}
@@ -294,7 +319,7 @@ declare class XObject implements IXObjectData_2 {
      * @param skipParse - skip data parsing 
      * 
      */
-    constructor(data: IXObjectData_2, defaults?: any,skipParse?:boolean) {
+    constructor(data: IXObjectData, defaults?: any,skipParse?:boolean) {
         if (defaults) {
             XUtils.mergeDefaultsWithData(data, defaults)
         }
@@ -353,7 +378,7 @@ declare class XObject implements IXObjectData_2 {
      * @param data data to parse
      * @param ignore - lis of words to ignore in the parse process
      */
-    parse(data: IXObjectData_2, ignore = reservedWords) {
+    parse(data: IXObjectData, ignore = reservedWords) {
 
         let cdata = Object.keys(data);
         cdata.forEach(field => {
@@ -373,7 +398,7 @@ declare class XObject implements IXObjectData_2 {
      * ...
      * }
      */
-    parseFieldsFromXDataObject(data: IXObjectData_2, fields:{[name:string]:any}) {
+    parseFieldsFromXDataObject(data: IXObjectData, fields:{[name:string]:any}) {
 
         let cdata = Object.keys(fields);
         cdata.forEach((field:string) => {
@@ -392,7 +417,7 @@ declare class XObject implements IXObjectData_2 {
      * @param {Array<string>} fields - array of field names (string)
      * @param checkNonXParams - also check non Xpell fields (fields that not starting with "_" sign)
      */
-    parseFields(data: IXObjectData_2, fields:Array<string>,checkNonXParams?:boolean) {
+    parseFields(data: IXObjectData, fields:Array<string>,checkNonXParams?:boolean) {
 
         fields.forEach(field => {
             if (data.hasOwnProperty(field)) {
@@ -546,8 +571,6 @@ declare class XObject implements IXObjectData_2 {
         }
     }
 }
-export { XObject as IXObjectData }
-export { XObject }
 
 /**
  * Xpell Module Object Manager
