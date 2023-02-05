@@ -15,7 +15,6 @@
  *
  */
 
-const XFolder = "./src/"
 
 export {default as Xpell,Xpell as _x} from "./src/Xpell"
 export {XUtils,XUtils as _xu} from "./src/XUtils"
@@ -23,11 +22,8 @@ export {XData} from "./src/XData"
 export {XParser} from "./src/XParser"
 export {XCommand} from "./src/XCommand"
 export {XLogger,XLogger as _xlog} from "./src/XLogger"
-export {XModule} from "./src/XModule"
-// import type IXObjectData from "./src/XObject"
-// export {IXObjectData}
+export {XModule,type XModuleData} from "./src/XModule"
 export {XObject,XObjectPack,type IXObjectData} from "./src/XObject"
 export {XObjectManager} from "./src/XObjectManager"
 export {XEventManager, XEventManager as _xem,type XEventListener} from "./src/XEventManager"
-// export type {XEventListener} from "./src/XEventManager"
-// export {XEventListener}
+export {type XNanoCommandPack} from "./src/XNanoCommands"

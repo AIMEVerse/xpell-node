@@ -63,11 +63,11 @@ export class XObject implements IXObjectData {
         this._nano_commands ={} 
         this.addNanoCommandPack(_xobject_basic_nano_commands)
         
-        if (data) {
-            if(!skipParse) {
+        if (!skipParse && data) {
+            // if() {
                 delete data._id // delete the _id field to remove duplication by the parse function
                 this.parse(data, reservedWords);
-            } 
+            // } 
             
         }
         
