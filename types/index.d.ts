@@ -296,11 +296,11 @@ export declare class XModule {
 
 }
 
-declare type XModuleData = {
+export declare type XModuleData = {
     _name: string
 }
 
-declare type XNanoCommandPack = {
+export declare type XNanoCommandPack = {
     [k:string] :(XCommand:XCommand,XObject?:XObject) => void
 }
 
@@ -330,11 +330,11 @@ export declare class XObject implements IXObjectData {
         this._nano_commands ={} 
         this.addNanoCommandPack(_xobject_basic_nano_commands)
 
-        if (data) {
-            if(!skipParse) {
-                delete data._id // delete the _id field to remove duplication by the parse function
-                this.parse(data, reservedWords);
-            } 
+        if (!skipParse && data) {
+            // if() {
+            delete data._id // delete the _id field to remove duplication by the parse function
+            this.parse(data, reservedWords);
+            // } 
 
         }
 
