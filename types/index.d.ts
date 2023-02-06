@@ -81,7 +81,7 @@ export declare const XData = new XDataSource();
 
 
 
-declare type XEvent = {
+export declare type XEvent = {
     _id: number
     _name: string
     _data: any
