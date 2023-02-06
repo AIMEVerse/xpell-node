@@ -77,17 +77,24 @@ export declare const XData = new XDataSource();
  *      //fire (trigger) event name "my-event" and simple object as data
  *      _xem.fire("my-event",{_data_param:"my data"})
  */
+// import {XUtils as _xu} from "./XUtils"
 
 
+
+declare type XEvent = {
+    _id: number
+    _name: string
+    _data: any
+}
 
 /**
  * This interface define the listener callable function (provided with "on" method)
  */
 export declare interface XEventListener {
-    (eventName:string,data:any):void
+    (xevent: XEvent): void
 }
 
-declare const  XEventManager = new XEventDispatcher();
+declare const XEventManager = new XEventDispatcher();
 export { XEventManager }
 export { XEventManager as _xem }
 
