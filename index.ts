@@ -15,9 +15,6 @@
  *
  */
 
-import Xpell from  "./src/Xpell"
-export default Xpell
-
 export {Xpell,Xpell as _x} from "./src/Xpell"
 export {XUtils,XUtils as _xu} from "./src/XUtils"
 export {XData} from "./src/XData"
