@@ -13,14 +13,21 @@
  *      //fire (trigger) event name "my-event" and simple object as data
  *      _xem.fire("my-event",{_data_param:"my data"})
  */
+// import {XUtils as _xu} from "./XUtils"
 
 
+
+export type XEvent = {
+    _id: number
+    _name: string
+    _data: any
+}
 
 /**
  * This interface define the listener callable function (provided with "on" method)
  */
 export interface XEventListener {
-    (eventName:string,data:any):void
+    (xevent: XEvent): void
 }
 
 /**
@@ -29,29 +36,35 @@ export interface XEventListener {
 class XEventDispatcher {
 
     //events dictionary object and listeners list
-    private _events: {[name:string]:Array<XEventListener>}
+    private _events: { [name: string]: Array<XEventListener> }
+    private _event_counter:number = 0
 
     constructor() {
         this._events = {}
     }
 
-    on(eventName:string, listener:XEventListener) {
+    on(eventName: string, listener: XEventListener) {
         if (!this._events[eventName]) {
             this._events[eventName] = [];
         }
         this._events[eventName].push(listener);
     }
 
-    fire(eventName:string, data?:any) {
+    fire(eventName: string, data?: any) {
         if (this._events[eventName]) {
-            this._events[eventName].forEach(listener => listener(eventName,data));
+            this._events[eventName].forEach((listener) => {
+                listener({
+                    _id:this._event_counter++,
+                    _name:eventName,
+                    _data:data})
+            });
         }
     }
-    
+
 }
 
 
-export const  XEventManager = new XEventDispatcher()
+export const XEventManager = new XEventDispatcher()
 
 export default XEventManager
 

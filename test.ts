@@ -8,9 +8,9 @@ _x.verbose()
 
 _x.start()
 
-_xem.on("xem-test",(eventName:string,data:any)=>{
-    console.log("Event + " + eventName, data)
+_xem.on("xem-test",(xevent)=>{
+    console.log("Event + " , xevent)
 })
 
 
-_xem.fire("xem-test",{data:"duck-off"})
+_xem.fire("xem-test",{myData:"duck-off"})
