@@ -30,7 +30,7 @@ import { XLogger as _xl } from "./XLogger";
 import XObjectManager from "./XObjectManager";
 import * as _XC from "./XConst"
 import { IXObjectData, XObject, XObjectPack } from "./XObject";
-import XCommand from "./XCommand";
+import XCommand, { XCommandData } from "./XCommand";
 
 
 
@@ -158,7 +158,7 @@ export class XModule {
      * @param {XCommand} XCommand input (JSON)
      * @returns command execution result
      */
-    async execute(xCommand: XCommand) {
+    async execute(xCommand: XCommand | XCommandData) {
 
 
         //search for xpell wrapping functions (starts with _ "underscore" example -> _start() , async _spell_async_func() )

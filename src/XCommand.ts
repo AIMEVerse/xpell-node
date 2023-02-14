@@ -3,11 +3,9 @@ import XUtils from "./XUtils"
 
 
 export type XCommandData = {
-    id:string,
-    _module?: string | null ,
-    _object?:string | null ,
-    _op?:string ,
-    _date_created?: number
+    _module: string  ,
+    _object?:string  ,
+    _op:string ,
     _params?: {
         [k:string] : string | number | Function
     },
@@ -15,22 +13,45 @@ export type XCommandData = {
 
 
 /**
- * @class XCommand
+ * XCommand class - this command is being sent to the Xpell parser or every XModule/XObject for execution
  */
 
-
 export  class XCommand {
-    private id:string  = XUtils.guid()
-    _module?: string | null 
-    _object?:string | null 
-    _op?:string 
-    _params!: {
+
+    /**
+     * The XModule to handle to command
+     */
+    _module!: string
+
+    /**
+     * The XObject that should handle the command (optional - uses only to send XCommand to specific object)
+     */
+    _object?:string 
+
+    /**
+     * The command operation (op/method) to execute
+     */
+    _op!:string 
+
+    /**
+     * command parameters array
+     */
+    _params?: {
         [k:string] : string | number | Function
     }
-    _date_created: number;
+
+
+    /**
+     * XCommand create date timestamp
+     */
+    d!: number
     
-    constructor() {
-        this._date_created = Date.now()
+    constructor(data?:XCommandData) {
+        if(data) {
+            Object.keys(data).forEach((key:string)=>{
+                this[<"_module">key] = data[<"_module">key]})
+        }
+        if(!this.d) this.d = Date.now()
     }
 
     /**
@@ -44,8 +65,8 @@ export  class XCommand {
      * @returns {any} the actual parameter value
      */
     getParam(position:number, name:string,defaultValue:any) {
-        if (this._params.hasOwnProperty(name)) return this._params[name]
-        else if (this._params.hasOwnProperty(position)) return this._params[position]
+        if (this._params?.hasOwnProperty(name)) return this._params[name]
+        else if (this._params?.hasOwnProperty(position)) return this._params[position]
         else return defaultValue
     }
 }

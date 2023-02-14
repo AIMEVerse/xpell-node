@@ -3,7 +3,7 @@
  */
 
 import { XUtils } from "./XUtils"
-import XCommand from "./XCommand";
+import XCommand, { XCommandData } from "./XCommand";
 import XParser from "./XParser"
 import {XLogger as _xlog} from "./XLogger";
 import {XEventManager as _xem} from "./XEventManager";
@@ -290,7 +290,7 @@ export class XObject implements IXObjectData {
      * }
      * 
      */
-    async execute(xCommand: XCommand) {
+    async execute(xCommand: XCommand | XCommandData) {
         // run nano commands
 
         if (xCommand._op && this._nano_commands[xCommand._op]) {

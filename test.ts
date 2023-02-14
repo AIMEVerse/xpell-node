@@ -1,6 +1,6 @@
 
 
-import { IXObjectData, _x,_xem } from "./index"
+import { IXObjectData, XCommand, XCommandData, _x,_xem } from "./index"
 
 //display Xpell engine info
 _x.verbose()
@@ -14,3 +14,7 @@ _xem.on("xem-test",(xevent)=>{
 
 
 _xem.fire("xem-test",{myData:"duck-off"})
+
+const xcmd:XCommandData = {
+    _
+}

@@ -9,7 +9,7 @@
     "docs"
   ],
   "type": "module",
-  "types": "./dist/index.d.ts",
+  "types": "./types/index.d.ts",
   "main": "./dist/xpell-core.umd.js",
   "module": "./dist/xpell-core.es.js",
   "exports": {
