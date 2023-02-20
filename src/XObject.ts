@@ -368,7 +368,6 @@ export class XObject implements IXObjectData {
             if (!this._xporter._ignore_fields.includes(field) &&
                 this.hasOwnProperty(field) && this[field] !== undefined) {
                 const tf = this[field]
-                console.log(tf,typeof tf)
                 if (typeof tf === "function") {
                     const funcStr = tf.toString()
                     if (!funcStr.startsWith("class")) { //in case of class reference it being ignored
