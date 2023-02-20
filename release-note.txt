@@ -1,10 +1,17 @@
+0.0.4
+-------
+XObject new functions:
+- toXData -> converts the XObject to a JSON
+- toString -> convert the XObject to a string
+- append -> append child object
+
 0.0.3
 --------
 - XEM - new event based system (XEvent)
 
 0.0.1
----------
 
+---------
 - Xpell -  interpreter engine 
 - XLogger - system logger
 - XData - real-time random access memory (RAM) for storing variables and objects

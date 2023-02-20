@@ -100,9 +100,9 @@ export class XModule {
         //await spell_object.init();
         this.objectManger.addObject(xObject)
         if (data._children) {
-            const sthis = this //strong "this" for anonymous function use
+            // const sthis = this //strong "this" for anonymous function use
             data._children.forEach(async (spell) => {
-                let new_spell = sthis.create(spell);
+                let new_spell = this.create(spell);
                 xObject.append(new_spell)
             });
         }
@@ -171,7 +171,6 @@ export class XModule {
         {
 
             const o = this.objectManger.getObjectByName(xCommand._op)
-            // console.log(o);
             if (o) { o.execute(xCommand) }
             else { throw "Xpell Module cant find op:" + xCommand._op }
         }
@@ -236,5 +235,6 @@ export class XModule {
 
 }
 
-export {XModuleData}
+const GenericModule = new XModule({_name:"xmodule"})
+export {XModuleData,GenericModule}
 export default XModule

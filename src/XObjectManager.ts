@@ -111,7 +111,6 @@ export class XObjectManager {
      * @returns {XObject}
      */
     getObject(xObjectId:string):XObject {
-        //console.log(this.spell_objects);
         return this.xObjects[xObjectId]
     }
 
