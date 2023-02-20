@@ -1,6 +1,6 @@
 {
   "name": "xpell-core",
-  "version": "0.0.45",
+  "version": "0.0.46",
   "description": "Xpell Real-Time Interpreter Core",
   "files": [
     "dist",
