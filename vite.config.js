@@ -30,7 +30,7 @@ export default {
     }
   },
   plugins: [dts({
-    outputDir: ['dist', 'types'],
+    outputDir: ['dist'],
     // include: ['src/index.ts'],
     exclude: ['src/ignore'],
     // aliasesExclude: [/^@components/],
