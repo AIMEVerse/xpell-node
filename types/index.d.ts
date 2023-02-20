@@ -106,7 +106,7 @@ declare type XDataXporter = {
     }
 }
 
-declare interface XDataXporterHandler {
+export declare interface XDataXporterHandler {
     (inst:any): any
 }
 
@@ -357,7 +357,7 @@ export declare type XModuleData = {
 /**
  * Single x-nano-command interface
  */
-declare interface XNanoCommand  {
+export declare interface XNanoCommand  {
     (xCommand: XCommand | XCommandData, xObject?: XObject): any
 }
 
