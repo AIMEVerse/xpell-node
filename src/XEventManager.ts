@@ -40,7 +40,7 @@ export interface XEventListener {
 /**
  * XEventDispatcher is the system event dispatcher and manager
  */
-class XEventDispatcher {
+export class _XEventManager {
 
     //events dictionary object and listeners list
     private _events: { [name: string]: Array<XEventListener> }
@@ -135,7 +135,7 @@ class XEventDispatcher {
 }
 
 
-export const XEventManager = new XEventDispatcher()
+export const XEventManager = new _XEventManager()
 
 export default XEventManager
 

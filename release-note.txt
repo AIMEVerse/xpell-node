@@ -10,8 +10,9 @@ Xpell-core Release Notes:
     - removeListener method to remove listener
 - XData Changes:
     - "variables" and "objects" properties are deprecated (will be supported in the next versions)
-    - new private (#) variables for "variables" and "objects" (accessed by accessors)
-    - new _v and _o getters replaces the "variables" and "objects" properties
+    - new private (#) variables for "objects" (accessed by accessors)
+    - new _o getters replaces "objects" properties
+    - "variables" is deprecated use objects to store primitives
     - clean method 
 - XObjectManager Changes:
     - new private (#) for internal properties
