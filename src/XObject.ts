@@ -151,16 +151,7 @@ export class XObject implements IXObjectData {
         this._children.forEach(child => child.dispose())
     }
 
-    //get _id() {return this.#_id}
-
-    /**
-     * occurs on Xpell.init
-     * must override
-     */
-    init(): void {
-        throw "init method not implemented"
-    }
-
+   
 
     /**
      * Parse data to the XObject

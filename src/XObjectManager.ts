@@ -1,3 +1,4 @@
+import { get } from "core-js/core/dict";
 import XEM from "./XEventManager"
 import XLogger from "./XLogger";
 import XObject, { XObjectPack } from "./XObject";
@@ -8,27 +9,35 @@ import XObject, { XObjectPack } from "./XObject";
  * XModules uses the Object Manager to create new XObjects by providing the class of the object by name
  */
 
+export type XObjectManagerIndex = {
+    [name:string]:any
+}
+
 export class XObjectManager {
-    objectClasses: {[name:string]:any};
-    xObjects: {[name:string]:any};
-    namesIndex: {[name:string]:any};
+    #_object_classes: XObjectManagerIndex
+    #_xobjects: XObjectManagerIndex
+    #_names_index: XObjectManagerIndex
     constructor() {
         /**
          * Object Classes dictionary
          */
-        this.objectClasses = {};
+        this.#_object_classes = {};
 
         /**
          * Live XObject that is being maintained by the Object Manager
          */
-        this.xObjects = {};
+        this.#_xobjects = {};
 
         /**
          * Object Names index - uses to get object by name
          */
-        this.namesIndex = {}
+        this.#_names_index = {}
     }
 
+
+    get _objects():XObjectManagerIndex{
+        return this.#_xobjects
+    }
     
 
     /**
@@ -46,7 +55,7 @@ export class XObjectManager {
      * @param xObjects The object class
      */
     registerObject(name:string, xObjects:XObject) {
-        this.objectClasses[name] = xObjects;
+        this.#_object_classes[name] = xObjects;
     }
 
     /**
@@ -55,7 +64,7 @@ export class XObjectManager {
      * @returns {boolean} 
      */
     hasObjectClass(name:string) {
-        return this.objectClasses.hasOwnProperty(name);
+        return this.#_object_classes.hasOwnProperty(name);
     }
 
     /**
@@ -64,15 +73,15 @@ export class XObjectManager {
      * @returns {XObject}
      */
     getObjectClass(name:string) {
-        return this.objectClasses[name];
+        return this.#_object_classes[name];
     }
 
     /**
      * Retrieves all the classes dictionary
-     * @returns 
+     * @returns XObjectManagerIndex
      */
-    getAllClasses() {
-        return this.objectClasses;
+    getAllClasses():XObjectManagerIndex {
+        return this.#_object_classes
     }
 
     /**
@@ -81,11 +90,11 @@ export class XObjectManager {
      */
     addObject(xObject:XObject) {
         if (xObject && xObject._id) {
-            this.xObjects[<string>xObject._id] = xObject
+            this.#_xobjects[<string>xObject._id] = xObject
             if (!xObject._name || (<string>xObject._name).length==0) {
                 xObject._name = xObject._id
             }
-            this.namesIndex[<string>xObject._name] = xObject._id
+            this.#_names_index[<string>xObject._name] = xObject._id
             XEM.fire("xpell-on-change")
         }
         else {
@@ -98,10 +107,10 @@ export class XObjectManager {
      * @param xObjectId object id to remove
      */
     removeObject(xObjectId:string) {
-        const obj = this.xObjects[xObjectId]
+        const obj = this.#_xobjects[xObjectId]
         if(obj) {
-            this.namesIndex[obj?.name] = null
-            this.xObjects[xObjectId] = null;
+            delete this.#_names_index[obj?.name] //= null
+            delete this.#_xobjects[xObjectId] //= null;
         }
     }
 
@@ -111,9 +120,18 @@ export class XObjectManager {
      * @returns {XObject}
      */
     getObject(xObjectId:string):XObject {
-        return this.xObjects[xObjectId]
+        return this.#_xobjects[xObjectId]
     }
 
+    /**
+     * alias to getObject
+     * @param id 
+     * @returns 
+     */
+    o(id:string){
+        return this.getObject(id)
+    }
+    
 
     /**
      * Retrieves XObject instance
@@ -121,8 +139,8 @@ export class XObjectManager {
      * @returns {XObject}
      */
     getObjectByName(objectName:string):XObject | null {
-        if(this.namesIndex[objectName]) {
-            return this.getObject(this.namesIndex[objectName])
+        if(this.#_names_index[objectName]) {
+            return this.getObject(this.#_names_index[objectName])
         } 
         return null
     }

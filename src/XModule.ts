@@ -189,10 +189,11 @@ export class XModule {
      * @param frameNumber Current frame number
      */
     async onFrame(frameNumber: number) {
-        Object.keys(this.objectManger.xObjects).forEach(key => {
-            const so:XObject = <any>this.objectManger.xObjects[key]
-            if (so && so.onFrame && typeof so.onFrame === 'function') {
-                so?.onFrame(frameNumber)
+        const omObjects = this.objectManger._objects
+        Object.keys(omObjects).forEach(key => {
+            const onFrameCallBack:XObject = <any>omObjects[key]
+            if (onFrameCallBack && onFrameCallBack.onFrame && typeof onFrameCallBack.onFrame === 'function') {
+                onFrameCallBack?.onFrame(frameNumber)
             }
         })
     }
