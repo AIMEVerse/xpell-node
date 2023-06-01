@@ -8,6 +8,7 @@ import XParser from "./XParser"
 import { XLogger as _xlog } from "./XLogger";
 import { XEventManager as _xem } from "./XEventManager";
 import { _xobject_basic_nano_commands, XNanoCommandPack,XNanoCommand } from "./XNanoCommands";
+import _xd from "./XData";
 
 export interface IXData {
     [k: string]: string | null | [] | undefined | Function | boolean | number | {}
@@ -24,15 +25,23 @@ const reservedWords: wordsList = { _children: "child nodes" }
  * XObject constructor data interface 
  * @interface IXObjectData
  * @param _xversion - minimum Xpell interpreter version (optional default value is 1.0)
+ * @deprecated use XObjectData type instead instead
  */
 export interface IXObjectData extends IXData {
     [k: string]: string | null | [] | undefined | Function | boolean | number | {}
-    _id?: string | null
-    // id?: string | null
+    _id?: string;
+    _type: string;
+    _children?: Array<XObject | XObjectData>
     _name?: string
-    _type?: string
-    _children?: Array<IXObjectData>
-    _xversion?: number
+    _data_source?: string
+    _on?:XObjectOnEventIndex
+    _on_create?: string | Function | undefined
+    _on_mount?: string | Function | undefined
+    _on_frame?: string | Function | undefined
+    _on_data?: string | Function | undefined
+    _process_frame?: boolean 
+    _process_data?: boolean 
+    
 }
 
 export interface XDataXporterHandler {
@@ -51,18 +60,62 @@ export type XDataXporter = {
     }
 }
 
+export type XObjectOnEventHandler = (xObject: XObject, data?: any) => void
+export interface XObjectOnEventIndex {
+    [eventName:string]:XObjectOnEventHandler
+}
+
+export type XObjectData = {
+    [k: string]: string | null | [] | undefined | Function | boolean | number | {}
+    _id?: string;
+    _type: string;
+    _children?: Array<XObject | XObjectData>
+    _name?: string
+    _data_source?: string
+    _on?:XObjectOnEventIndex
+    _on_create?: string | Function | undefined
+    _on_mount?: string | Function | undefined
+    _on_frame?: string | Function | undefined
+    _on_data?: string | Function | undefined
+    _process_frame?: boolean 
+    _process_data?: boolean 
+}
+
 /**
  * XObject class
  * @class XObject
  */
-export class XObject implements IXObjectData {
+export class XObject  {
     [k: string]: string | null | [] | undefined | Function | boolean | number | {}
-    _children: Array<XObject>
-    private _nano_commands: { [k: string]: XNanoCommand }
+    _id: string;
+    _type: string;
+    _children: Array<XObject | XObjectData> = []
+    _name?: string
+    _data_source?: string
+    _on:XObjectOnEventIndex = {}
+    _on_create?: string | Function | undefined
+    _on_mount?: string | Function | undefined
+    _on_frame?: string | Function | undefined
+    _on_data?: string | Function | undefined
+    _on_event?: string | Function | undefined
+
+
+    //real-time controllers
+    _process_frame: boolean = true
+    _process_data: boolean = true
+
+    //local cache for nano commands
+
+    private _nano_commands: { [k: string]: XNanoCommand } = {}
+    private _cache_cmd_txt?: string;
+    private _cache_jcmd?: any;
+    private _event_listeners_ids: {[eventName:string]:string} = {}
     private _xporter:XDataXporter = {
         _ignore_fields: ["_to_xdata_ignore_fields", "_xporter","_children"],
         _instance_xporters: {}
     }
+
+
     /**
      * XObject constructor is creating the object and adding all the data keys to the XObject instance
      * @param data constructor input data (object)
@@ -70,7 +123,7 @@ export class XObject implements IXObjectData {
      * @param skipParse - skip data parsing 
      * 
      */
-    constructor(data: IXObjectData, defaults?: any, skipParse?: boolean) {
+    constructor(data: XObjectData, defaults?: any, skipParse?: boolean) {
         if (defaults) {
             XUtils.mergeDefaultsWithData(data, defaults)
         }
@@ -94,15 +147,55 @@ export class XObject implements IXObjectData {
             // } 
 
         }
-
+        this.parseOnEvents()
     }
+
+
+    parseOnEvents() {
+        Object.keys(this._on).forEach(eventName => {
+            if(typeof this._on[eventName] === "function") {
+                this.addEventListener(eventName,this._on[eventName])
+            }
+            else if(typeof this._on[eventName] === "string") {
+                // this.addEventListener(eventName,(xObject:XObject,eventData:any) => {
+                //     xObject.run(xObject._on[eventName])
+                // })
+                // unimplemented
+            }
+            else {
+                throw new Error("event handler must be a function or string")
+            }
+        })  
+    }
+
+    addEventListener(eventName:string,handler:XObjectOnEventHandler) {
+        const event_listener_id = _xem.on(eventName,(eventData) => {  handler(this,eventData)})
+        this._event_listeners_ids[eventName] = event_listener_id
+        // console.log("regstering event  name " + eventName)
+    }
+
+
+    removeEventListener(eventName:string) {
+        // console.log("removing event  name " + eventName);
+        if(this._event_listeners_ids[eventName]) {
+            _xem.remove(this._event_listeners_ids[eventName])
+            delete this._event_listeners_ids[eventName]
+        }
+    }
+
+    removeAllEventListeners() {
+        const keys = Object.keys(this._event_listeners_ids)
+        keys.forEach(key => this.removeEventListener(key))
+    }
+
+
 
     /**
      * Append a child XObject to this XObject
      * @param xobject 
      */
     append(xobject:XObject) {
-        this._children.push(xobject)
+        this._children?.push(xobject)
     }
 
     /**
@@ -148,7 +241,17 @@ export class XObject implements IXObjectData {
 
 
     async dispose() {
-        this._children.forEach(child => child.dispose())
+        this._process_data = false
+        this._process_frame = false
+        this.removeAllEventListeners()
+        if(this._children) {
+            this._children.forEach(child => {
+                if (typeof child.dispose == "function") {
+                     child.dispose()
+                }
+            })
+        }
+        this._children = []
     }
 
    
@@ -158,7 +261,7 @@ export class XObject implements IXObjectData {
      * @param data data to parse
      * @param ignore - lis of words to ignore in the parse process
      */
-    parse(data: IXObjectData, ignore = reservedWords) {
+    parse(data: XObjectData, ignore = reservedWords) {
 
         let cdata = Object.keys(data);
         cdata.forEach(field => {
@@ -178,7 +281,7 @@ export class XObject implements IXObjectData {
      * ...
      * }
      */
-    parseFieldsFromXDataObject(data: IXObjectData, fields: { [name: string]: any }) {
+    parseFieldsFromXDataObject(data: XObjectData, fields: { [name: string]: any }) {
 
         let cdata = Object.keys(fields);
         cdata.forEach((field: string) => {
@@ -197,7 +300,7 @@ export class XObject implements IXObjectData {
      * @param {Array<string>} fields - array of field names (string)
      * @param checkNonXParams - also check non Xpell fields (fields that not starting with "_" sign)
      */
-    parseFields(data: IXObjectData, fields: Array<string>, checkNonXParams?: boolean) {
+    parseFields(data: XObjectData, fields: Array<string>, checkNonXParams?: boolean) {
 
         fields.forEach(field => {
             if (data.hasOwnProperty(field)) {
@@ -234,7 +337,7 @@ export class XObject implements IXObjectData {
             }
         }
         //propagate event to children
-        this._children.forEach((child: XObject) => {
+        this._children.forEach((child) => {
             if (child.onCreate && typeof child.onCreate === 'function') {
                 child.onCreate()
             }
@@ -260,11 +363,34 @@ export class XObject implements IXObjectData {
             }
         }
         //propagate event to children
-        this._children.forEach((child: XObject) => {
+        this._children.forEach((child) => {
             if (child.onMount && typeof child.onMount === 'function') {
                 child.onMount()
             }
         })
+    }
+
+
+    emptyDataSource() {
+        if(this._data_source && typeof this._data_source === "string") {
+            _xd.delete(this._data_source)
+        }
+    }
+
+
+    /**
+     * Triggers when new data is being received from the data source
+     * @param data - the data
+     * if override this method make sure to call super.onData(data) to run the _on_data attribute
+     */
+    async onData(data: any) {
+        if (this._on_data && this._process_data) {
+            if (typeof this._on_data == "function") {
+                this._on_data(this, data)
+            } else if (typeof this._on_data == "string") {
+                this.run(this._id + " " + this._on_data) //
+            }
+        }
     }
 
     /**
@@ -289,21 +415,31 @@ export class XObject implements IXObjectData {
      */
     async onFrame(frameNumber: number) {
         //
-        if (this._on_frame) {
+        if (this._on_frame && this._process_frame) {
             if (typeof this._on_frame == "function") {
-                this._on_frame(this, frameNumber)
+                await this._on_frame(this, frameNumber)
             } else if (typeof this._on_frame == "string") {
-                this.run(this._id + " " + this._on_frame) //
+                await this.run(this._id + " " + this._on_frame) //
+            }
+        }
+
+        if(this._data_source && this._process_data) {
+            if(_xd.has(this._data_source)) {
+                await this.onData(_xd._o[this._data_source])
             }
         }
 
         //propagate event to children
-        this._children.forEach((child: XObject) => {
+        this._children.forEach((child) => {
             if (child.onFrame && typeof child.onFrame === 'function') {
                 child.onFrame(frameNumber)
             }
         })
     }
+
+
+    
+
 
     /**
      * Runs object nano commands
@@ -353,8 +489,8 @@ export class XObject implements IXObjectData {
      * Return an IXObjectData JSON representation of the XObject
      * @returns IXObjectData
      */
-    toXData(): IXObjectData {
-        const out: IXObjectData = {}
+    toXData(): IXData {
+        const out: IXData = {}
         Object.keys(this).forEach(field => {
             if (!this._xporter._ignore_fields.includes(field) &&
                 this.hasOwnProperty(field) && this[field] !== undefined) {
@@ -388,7 +524,11 @@ export class XObject implements IXObjectData {
         //children are being created separately
         out._children = []
         if(this._children.length>0) {
-            this._children.forEach(child => out._children?.push(child.toXData()))
+            this._children.forEach(child => {
+                if(typeof child.toXData === "function") {
+                    (out._children as Array<IXData>)?.push(child.toXData())
+                }
+            })
         }
 
         return out

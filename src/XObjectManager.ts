@@ -84,6 +84,10 @@ export class XObjectManager {
         return this.#_object_classes
     }
 
+    get _classes():XObjectManagerIndex {
+        return this.#_object_classes
+    }
+
     /**
      * Add XObject instance to the manager
      * @param xObject XObject to maintain
@@ -95,7 +99,6 @@ export class XObjectManager {
                 xObject._name = xObject._id
             }
             this.#_names_index[<string>xObject._name] = xObject._id
-            XEM.fire("xpell-on-change")
         }
         else {
             XLogger.log("unable to add object")
@@ -128,7 +131,7 @@ export class XObjectManager {
      * @param id 
      * @returns 
      */
-    o(id:string){
+    go(id:string){
         return this.getObject(id)
     }
     

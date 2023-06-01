@@ -60,7 +60,7 @@ export class _XEventManager {
      *         console.log("XEM Event " + data)
      *    })
      */
-    on(eventName: string, listener: XEventListener, options?:XEventListenerOptions) {
+    on(eventName: string, listener: XEventListener, options?:XEventListenerOptions): string {
         if (!this._events[eventName]) {
             this._events[eventName] = [];
         }
@@ -86,7 +86,7 @@ export class _XEventManager {
      * This method remove listener by listener id
      * @param listenerId listener id to remove
      */
-    removeListener(listenerId: string) {
+    remove(listenerId: string) {
         if (this._listeners_to_event_index[listenerId]) {
             const eventName = this._listeners_to_event_index[listenerId]
             this._events[eventName].forEach((listener, index) => {
@@ -126,7 +126,7 @@ export class _XEventManager {
                     eventsToRemove.push(listener._id)
                 }
             });
-            eventsToRemove.forEach((listenerId)=>this.removeListener(listenerId))
+            eventsToRemove.forEach((listenerId)=>this.remove(listenerId))
         }
     }
 

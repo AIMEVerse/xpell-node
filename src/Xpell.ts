@@ -49,21 +49,21 @@ import {XEventManager as XEM} from  "./XEventManager"
  * @class  Xpell main engine
  */
 export class XpellEngine {
-    version : string
-    engineId: string
-    frameNumber: number
-    #fpsCalc: FPSCalc
+    _version : string
+    _engine_id: string
+    _frame_number: number
+    #fps_calc: FPSCalc
 
-    #modules:{[name:string]:any} = {}
+    #_modules:{[name:string]:any} = {}
     parser: typeof XParser
    
     constructor() {
-        this.version = "0.0.1"
-        this.engineId = XUtils.guid()
-        this.frameNumber = 0
-        this.#fpsCalc = new FPSCalc()
+        this._version = "0.0.1"
+        this._engine_id = XUtils.guid()
+        this._frame_number = 0
+        this.#fps_calc = new FPSCalc()
         this.parser = XParser
-        this.#modules = {}
+        this.#_modules = {}
         XEM.fire("xpell-init")
         _xlog.enabled = false
         //this.load()
@@ -83,10 +83,10 @@ export class XpellEngine {
      * @param {XModule} xModule 
      */
     loadModule(xModule:XModule):void {
-        if (this.#modules.hasOwnProperty(xModule._name)) {
+        if (this.#_modules.hasOwnProperty(xModule._name)) {
             _xlog.log("Module " + xModule._name + " already loaded")
         } else {
-            this.#modules[<any>xModule._name] = xModule;
+            this.#_modules[<any>xModule._name] = xModule;
             xModule.load()
         }
     }
@@ -105,7 +105,7 @@ export class XpellEngine {
      * Display information about the Xpell engine to the console
      */
     info(){
-        _xlog.log("Xpell information:\n- Engine Id: "  + this.engineId + "\n- Version " + this.version)   
+        _xlog.log("Xpell information:\n- Engine Id: "  + this._engine_id + "\n- Version " + this._version)   
     }
 
 
@@ -128,8 +128,8 @@ export class XpellEngine {
      * @param {XCommand} 
      */
     execute(xcmd:XCommand):any {
-        if(xcmd && xcmd._module && this.#modules[xcmd._module]) {
-            return this.#modules[xcmd._module].execute(xcmd)
+        if(xcmd && xcmd._module && this.#_modules[xcmd._module]) {
+            return this.#_modules[xcmd._module].execute(xcmd)
         } else {
             throw "Xpell module " + xcmd._module + " not loaded"
         }
@@ -142,14 +142,14 @@ export class XpellEngine {
      * calls all the sub-modules onFrame methods (if implemented)
      */
      onFrame():void {     
-        this.frameNumber++
-        Object.keys(this.#modules).forEach(mod => {
-            if(this.#modules[mod].onFrame && typeof this.#modules[mod].onFrame === 'function') {
-                this.#modules[mod].onFrame(this.frameNumber)
+        this._frame_number++
+        Object.keys(this.#_modules).forEach(mod => {
+            if(this.#_modules[mod].onFrame && typeof this.#_modules[mod].onFrame === 'function') {
+                this.#_modules[mod].onFrame(this._frame_number)
             }
         })
-        XData.variables["frame-number"] = this.frameNumber
-        XData.variables["fps"] = this.#fpsCalc.calc()
+        XData._o["frame-number"] = this._frame_number
+        XData._o["fps"] = this.#fps_calc.calc()
         
         requestAnimationFrame(() => {Xpell.onFrame()})         
     }
@@ -161,7 +161,7 @@ export class XpellEngine {
      * @returns {XModule}
      */
     getModule(moduleName:string):XModule{
-        return this.#modules[moduleName]
+        return this.#_modules[moduleName]
     }
 
     /**

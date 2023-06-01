@@ -33,7 +33,7 @@ export class _XData {
     
 
     /**
-     * This method gets the XDataObject object
+     * This method gets the XData object
      * @returns XDataObject object
      * @example
      *  // get the XDataObject object
@@ -44,6 +44,42 @@ export class _XData {
     get _o(){
         return this.#_objects
     }
+
+
+    /**
+     * This method adds an object to the XData object
+     * @param objectId 
+     * @param object
+     * @comment It is also possible to use the XData._o property -> XData._o["my-object-id"] = {my:"object"} 
+     * */
+    add(objectId:string, object:any) {
+        this.#_objects[objectId] = object
+    }
+
+    /**
+     * This method checks if the XData object has an object by id
+     * @param objectId
+     * @returns boolean
+     * @comment It is also possible to query the XData._o property -> if(XData._o["my-object-id"])...
+     * */
+    has(objectId:string):boolean {
+        return this.#_objects.hasOwnProperty(objectId)
+    }
+
+    /**
+     * Deletes an object from the XData object
+     * @param objectId 
+     */
+    delete(objectId:string) {
+        delete this.#_objects[objectId]
+    }
+
+    pick(objectId:string) {
+        const obj = this.#_objects[objectId]
+        this.delete(objectId)
+        return obj
+    }
+
 
     /**
      * This method cleans the XData Memory

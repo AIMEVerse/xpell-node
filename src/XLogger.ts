@@ -8,7 +8,7 @@
 /**
  * @class XLoggerEngine Xpell Logger engine
  */
-export class XLoggerEngine  {
+export class _XLogger  {
     /**
      * Enable logger activity if false no logs will be displayed
      */
@@ -67,5 +67,5 @@ export class XLoggerEngine  {
 /**
  * 
  */
-export const XLogger = new XLoggerEngine()
+export const XLogger = new _XLogger()
 export default XLogger
