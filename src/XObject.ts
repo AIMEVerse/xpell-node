@@ -6,9 +6,9 @@ import { XUtils } from "./XUtils"
 import XCommand, { XCommandData } from "./XCommand";
 import XParser from "./XParser"
 import { XLogger as _xlog } from "./XLogger";
-import { XEventManager as _xem } from "./XEventManager";
+import { XEventListenerOptions, XEventManager as _xem } from "./XEventManager";
 import { _xobject_basic_nano_commands, XNanoCommandPack,XNanoCommand } from "./XNanoCommands";
-import _xd from "./XData";
+import _xd, { XDataObject } from "./XData";
 
 export interface IXData {
     [k: string]: string | null | [] | undefined | Function | boolean | number | {}
@@ -73,6 +73,7 @@ export type XObjectData = {
     _name?: string
     _data_source?: string
     _on?:XObjectOnEventIndex
+    _once?:XObjectOnEventIndex
     _on_create?: string | Function | undefined
     _on_mount?: string | Function | undefined
     _on_frame?: string | Function | undefined
@@ -91,8 +92,9 @@ export class XObject  {
     _type: string;
     _children: Array<XObject | XObjectData> = []
     _name?: string
-    _data_source?: string
+    _data_source?: string //XData source
     _on:XObjectOnEventIndex = {}
+    _once:XObjectOnEventIndex = {}
     _on_create?: string | Function | undefined
     _on_mount?: string | Function | undefined
     _on_frame?: string | Function | undefined
@@ -103,6 +105,9 @@ export class XObject  {
     //real-time controllers
     _process_frame: boolean = true
     _process_data: boolean = true
+
+
+    protected _xem_options:XEventListenerOptions
 
     //local cache for nano commands
 
@@ -121,14 +126,14 @@ export class XObject  {
      * @param data constructor input data (object)
      * @param defaults - defaults to merge with data
      * @param skipParse - skip data parsing 
-     * 
+     * if override this method make sure to call super.init(data,skipParse) and to set skipParse to true
      */
     constructor(data: XObjectData, defaults?: any, skipParse?: boolean) {
         if (defaults) {
             XUtils.mergeDefaultsWithData(data, defaults)
         }
 
-        this._id = (data && data._id) ? data._id : "so-" + XUtils.guid();
+        this._id = (data && data._id) ? data._id : "xo-" + XUtils.guid();
         this._type = "object" //default type
         this._children = []
         this._nano_commands = {}
@@ -139,37 +144,59 @@ export class XObject  {
         this.addXporterInstanceXporter(XObject,(objectInstance: XObject) => {
             return objectInstance.toXData()
         })
+        this._xem_options = {
+            _instance:_xem
+        }
+        this.init(data,skipParse)
         
+    }
+
+    init(data?:any,skipParse?:boolean) {
         if (!skipParse && data) {
             // if() {
             delete data._id // delete the _id field to remove duplication by the parse function
             this.parse(data, reservedWords);
-            // } 
+            this.parseEvents(this._xem_options)
 
         }
-        this.parseOnEvents()
     }
 
-
-    parseOnEvents() {
+    parseEvents(options?:XEventListenerOptions) {
         Object.keys(this._on).forEach(eventName => {
             if(typeof this._on[eventName] === "function") {
-                this.addEventListener(eventName,this._on[eventName])
+                this.addEventListener(eventName,this._on[eventName],options)
             }
-            else if(typeof this._on[eventName] === "string") {
-                // this.addEventListener(eventName,(xObject:XObject,eventData:any) => {
-                //     xObject.run(xObject._on[eventName])
-                // })
-                // unimplemented
-            }
+            // else if(typeof this._on[eventName] === "string") {
+            //     console.error("string event handler not supported yet")
+            // }
             else {
-                throw new Error("event handler must be a function or string")
+                throw new Error("event handler must be a function " +eventName)
             }
-        })  
+        })
+
+        const onceOptions:XEventListenerOptions =  {}
+        Object.assign(onceOptions,options)
+        onceOptions._once = true
+        // console.log("once options",onceOptions._once);
+        
+        Object.keys(this._once).forEach(eventName => {
+            if(typeof this._once[eventName] === "function") {
+                this.addEventListener(eventName,this._once[eventName],onceOptions)
+            }
+            // else if(typeof this._on[eventName] === "string") {
+            //     console.error("string event handler not supported yet")
+            // }
+            else {
+                throw new Error("event handler must be a function")
+            }
+        })
     }
 
-    addEventListener(eventName:string,handler:XObjectOnEventHandler) {
-        const event_listener_id = _xem.on(eventName,(eventData) => {  handler(this,eventData)})
+
+    addEventListener(eventName:string,handler:XObjectOnEventHandler,options?:XEventListenerOptions) {
+
+        const xem = (this._xem_options._instance) ? this._xem_options._instance : _xem
+        const event_listener_id = xem.on(eventName,(eventData) => {  handler(this,eventData)},options)
         this._event_listeners_ids[eventName] = event_listener_id
         // console.log("regstering event  name " + eventName)
     }
@@ -178,7 +205,7 @@ export class XObject  {
     removeEventListener(eventName:string) {
         // console.log("removing event  name " + eventName);
         if(this._event_listeners_ids[eventName]) {
-            _xem.remove(this._event_listeners_ids[eventName])
+            this._xem_options._instance?.remove(this._event_listeners_ids[eventName])
             delete this._event_listeners_ids[eventName]
         }
     }
@@ -388,7 +415,7 @@ export class XObject  {
             if (typeof this._on_data == "function") {
                 this._on_data(this, data)
             } else if (typeof this._on_data == "string") {
-                this.run(this._id + " " + this._on_data) //
+                this.run(this._id + " " + this._on_data) 
             }
         }
     }

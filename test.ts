@@ -45,9 +45,11 @@ const xobj: XObjectData = {
         "xem-test": (x, data) => {
             console.log("event to " + x._id, data);
         },
+    },
+    _once:{
         "xem-shut": (x, data) => {
             // gm.remove(x._id)
-            console.log("event to " + x._id, data);
+            console.log("event one,shut to " + x._id, data);
         }
     },
     _children: [
@@ -75,6 +77,6 @@ const xo = gm.create(xobj)
 // _xem.removeListener(listener)
 // _xem.fire("xem-test","duck-off2")
 
-// _xem.fire("xem-shut","duck-off")
+_xem.fire("xem-shut","duck-off")
 _xd._o["my-data-source"] = "inconceivable"
-// _xem.fire("xem-test","duck-off2")
+_xem.fire("xem-test","duck-off2")

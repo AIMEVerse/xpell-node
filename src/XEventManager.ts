@@ -13,6 +13,7 @@
  *      //fire (trigger) event name "my-event" and simple object as data
  *      _xem.fire("my-event",{_data_param:"my data"})
  */
+import {  _xlog } from "./XLogger"
 import {XUtils as _xu} from "./XUtils"
 
 
@@ -26,6 +27,7 @@ export type XEvent = {
 
 export type XEventListenerOptions =  {
     _once?: boolean
+    _instance?: _XEventManager
 }
 
 /**
@@ -41,10 +43,18 @@ export interface XEventListener {
  * XEventDispatcher is the system event dispatcher and manager
  */
 export class _XEventManager {
+    _log_rules: {
+        register: boolean,
+        remove: boolean,
+
+    } = {
+            register: false,
+            remove: false
+        }
 
     //events dictionary object and listeners list
-    private _events: { [name: string]: Array<XEventListener> }
-    private _listeners_to_event_index: { [listernerId: string]: string} = {}
+    protected _events: { [name: string]: Array<XEventListener> }
+    protected _listeners_to_event_index: { [listernerId: string]: string} = {}
     constructor() {
         this._events = {}
     }
@@ -68,6 +78,7 @@ export class _XEventManager {
         listener._id =  _xu.guid()
         listener._options = options
         this._listeners_to_event_index[listener._id] = eventName
+        if(this._log_rules.register) _xlog.log("XEM Register " + eventName, listener._id)
         return listener._id
     }
 
@@ -95,6 +106,7 @@ export class _XEventManager {
                 }
             })
             delete this._listeners_to_event_index[listenerId]
+            if(this._log_rules.remove) _xlog.log("XEM Remove " + eventName, listenerId)
         }
     }
 

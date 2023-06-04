@@ -18,7 +18,7 @@ export type XDataVariable = {[_id: string ]: string | number | boolean}
 
 
 export class _XData {
-    //deprecated use _v and _o
+    //deprecated use  _o instead
     objects: XDataObject = {}
     variables: XDataVariable = {}
 
@@ -52,7 +52,7 @@ export class _XData {
      * @param object
      * @comment It is also possible to use the XData._o property -> XData._o["my-object-id"] = {my:"object"} 
      * */
-    add(objectId:string, object:any) {
+    set(objectId:string, object:any) {
         this.#_objects[objectId] = object
     }
 
@@ -74,6 +74,11 @@ export class _XData {
         delete this.#_objects[objectId]
     }
 
+    /**
+     * Gets an object and delete it from the XData object list
+     * @param objectId 
+     * @returns 
+     */
     pick(objectId:string) {
         const obj = this.#_objects[objectId]
         this.delete(objectId)

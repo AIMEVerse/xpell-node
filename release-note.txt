@@ -27,6 +27,8 @@ Xpell-core Release Notes:
         * _on_data: Function | string - a function or xpell command when data is present on the data source
         * _process_frame:boolean -  if false the onFrame and _on_frame will not be execute (true by default)
         * _process_data:boolean -  if false the onFrame and _on_data will not be execute (true by default)
+        * _on: EventIndex - and index of event listeners for the object
+        * _once: EventIndex - and index of event listeners for the object to trigger one time
     - new methods:
         * onData(xobj,data) triggers when data arrives (if override this method make sure to call super.onData(data) to run the _on_data attribute)
 - XModule Changes:

@@ -69,3 +69,4 @@ export class _XLogger  {
  */
 export const XLogger = new _XLogger()
 export default XLogger
+export {XLogger as _xlog}
