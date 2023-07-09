@@ -41,6 +41,15 @@ export class XObjectManager {
     
 
     /**
+     * Checks if an object is found in the object manager
+     * @param xObjectId 
+     * @returns 
+     */
+    hasObject(xObjectId:string):boolean {
+        return this.#_xobjects.hasOwnProperty(xObjectId)
+    }
+
+    /**
      * Register multiple classes dictionary into the object manager
      * @param xObjects - key value list -> \{"view":XView,...\}
      */
