@@ -2,13 +2,13 @@
  * XObject - Base Xpell object for Xpell modules
  */
 
-import { XUtils } from "./XUtils"
-import XCommand, { XCommandData } from "./XCommand";
-import XParser from "./XParser"
-import { XLogger as _xlog } from "./XLogger";
-import { XEventListenerOptions, XEventManager as _xem } from "./XEventManager";
-import { _xobject_basic_nano_commands, XNanoCommandPack,XNanoCommand } from "./XNanoCommands";
-import _xd, { XDataObject } from "./XData";
+import { XUtils } from "./XUtils.js"
+import XCommand, { XCommandData } from "./XCommand.js";
+import XParser from "./XParser.js"
+import { XLogger as _xlog } from "./XLogger.js";
+import { XEventListenerOptions, XEventManager as _xem } from "./XEventManager.js";
+import { _xobject_basic_nano_commands, XNanoCommandPack,XNanoCommand } from "./XNanoCommands.js";
+import _xd, { XDataObject } from "./XData.js";
 
 export interface IXData {
     [k: string]: string | null | [] | undefined | Function | boolean | number | {}
@@ -111,12 +111,12 @@ export class XObject  {
 
     //local cache for nano commands
 
-    private _nano_commands: { [k: string]: XNanoCommand } = {}
-    private _cache_cmd_txt?: string;
-    private _cache_jcmd?: any;
-    private _event_listeners_ids: {[eventName:string]:string} = {}
-    private _xporter:XDataXporter = {
-        _ignore_fields: ["_to_xdata_ignore_fields", "_xporter","_children","_on","_once","_on_create","_on_mount","_on_frame","_on_data","_process_frame","_process_data"],
+    protected _nano_commands: { [k: string]: XNanoCommand } = {}
+    protected _cache_cmd_txt?: string;
+    protected _cache_jcmd?: any;
+    protected _event_listeners_ids: {[eventName:string]:string} = {}
+    protected _xporter:XDataXporter = {
+        _ignore_fields: ["_to_xdata_ignore_fields", "_xporter","_children","_on","_once","_on_create","_on_mount","_on_frame","_on_data","_process_frame","_process_data","_xem_options","_event_listeners_ids"],
         _instance_xporters: {}
     }
 
@@ -177,15 +177,11 @@ export class XObject  {
         const onceOptions:XEventListenerOptions =  {}
         Object.assign(onceOptions,options)
         onceOptions._once = true
-        // console.log("once options",onceOptions._once);
         
         Object.keys(this._once).forEach(eventName => {
             if(typeof this._once[eventName] === "function") {
                 this.addEventListener(eventName,this._once[eventName],onceOptions)
             }
-            // else if(typeof this._on[eventName] === "string") {
-            //     console.error("string event handler not supported yet")
-            // }
             else {
                 throw new Error("event handler must be a function")
             }
@@ -198,12 +194,10 @@ export class XObject  {
         const xem = (this._xem_options._instance) ? this._xem_options._instance : _xem
         const event_listener_id = xem.on(eventName,(eventData) => {  handler(this,eventData)},options)
         this._event_listeners_ids[eventName] = event_listener_id
-        // console.log("regstering event  name " + eventName)
     }
 
 
     removeEventListener(eventName:string) {
-        // console.log("removing event  name " + eventName);
         if(this._event_listeners_ids[eventName]) {
             this._xem_options._instance?.remove(this._event_listeners_ids[eventName])
             delete this._event_listeners_ids[eventName]

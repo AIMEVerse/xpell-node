@@ -2,10 +2,10 @@
  * This file contains all the Basic Nano Commands of the Xobject
 */
 
-import XCommand, { XCommandData } from "./XCommand"
-import { XEventManager as _xem } from "./XEventManager"
-import { XLogger as _xlog } from "./XLogger"
-import XObject from "./XObject"
+import XCommand, { XCommandData } from "./XCommand.js"
+import { XEventManager as _xem } from "./XEventManager.js"
+import { XLogger as _xlog } from "./XLogger.js"
+import XObject from "./XObject.js"
 
 /**
  * Single x-nano-command interface

@@ -6,15 +6,15 @@
  * 1.Event Listen
  *      // listen to event name "my-event" and display the event data to the console when fired
  *      _xem.on("my-event",(eventName,data)=>{
- *          console.log("XEM Event " + eventName,data)
+ *          _Xlog.log("XEM Event " + eventName,data)
  *      })
  * 
  * 2. Event Fire
  *      //fire (trigger) event name "my-event" and simple object as data
  *      _xem.fire("my-event",{_data_param:"my data"})
  */
-import {  _xlog } from "./XLogger"
-import {XUtils as _xu} from "./XUtils"
+import {  _xlog } from "./XLogger.js"
+import {XUtils as _xu} from "./XUtils.js"
 
 
 
@@ -67,7 +67,7 @@ export class _XEventManager {
      * @example
      *     // listen to event name "my-event" and display the event data to the console when fired
      *    _xem.on("my-event",(data)=>{
-     *         console.log("XEM Event " + data)
+     *         _xlog.log("XEM Event " + data)
      *    })
      */
     on(eventName: string, listener: XEventListener, options?:XEventListenerOptions): string {

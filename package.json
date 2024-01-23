@@ -1,7 +1,7 @@
 {
-  "name": "xpell-core",
-  "version": "0.0.515",
-  "description": "Xpell Real-Time Interpreter Core",
+  "name": "xpell-node",
+  "version": "0.0.9",
+  "description": "Xpell Real-Time Interpreter for Node.js",
   "files": [
     "dist",
     "src",
@@ -9,21 +9,15 @@
     "docs"
   ],
   "type": "module",
-  "types": "./dist/index.d.ts",
-  "main": "./dist/xpell-core.umd.js",
-  "module": "./dist/xpell-core.es.js",
-  "exports": {
-    ".": {
-      "import": "./dist/xpell-core.es.js",
-      "require": "./dist/xpell-core.umd.js"
-    }
-  },
+  "types": "./dist/xpell.d.ts",
+  "main": "./dist/xpell.js",
+  "module": "./dist/xpell.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "vite .",
     "docs": "typedoc --options ./typedoc.json --tsconfig ./",
     "types": "npx -p typescript tsc index.ts -t es2021 --declaration --allowJs --emitDeclarationOnly -moduleResolution node --outDir types",
-    "build": "vite build",
+    "build": "tsc -p .",
     "pub": "vite build && npm publish"
   },
   "author": "Tamir Fridman <fridman.tamir@gmail.com> (https://github.com/fridman-tamir)",
@@ -35,9 +29,6 @@
   "devDependencies": {
     "@types/core-js": "^2.5.5",
     "@types/node": "^14.18.36",
-    "typedoc": "^0.23.10",
-    "typescript": "^4.9.5",
-    "vite": "^3.0.2",
-    "vite-plugin-dts": "^1.7.2"
+    "typescript": "^4.9.5"
   }
 }

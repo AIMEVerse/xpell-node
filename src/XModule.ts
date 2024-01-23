@@ -24,13 +24,13 @@
  *      - when calling the method there is no need for the underscore sign, spaces and dashes will be converted to underscore
  *  '''
  */
-import XUtils from "./XUtils"
-import XParser from "./XParser"
-import { XLogger as _xl } from "./XLogger";
-import XObjectManager from "./XObjectManager";
-import * as _XC from "./XConst"
-import { XObjectData, XObject, XObjectPack } from "./XObject";
-import XCommand, { XCommandData } from "./XCommand";
+import XUtils from "./XUtils.js"
+import XParser from "./XParser.js"
+import { XLogger as _xl } from "./XLogger.js";
+import XObjectManager from "./XObjectManager.js";
+import * as _XC from "./XConst.js"
+import { XObjectData, XObject, XObjectPack } from "./XObject.js";
+import XCommand, { XCommandData } from "./XCommand.js";
 
 
 
@@ -58,14 +58,14 @@ export class XModule {
         }
 
     //private object manager instance
-    #_object_manger = new XObjectManager()
+    _object_manger:XObjectManager
     //engine: any;  //deprecated remove after spell3d
 
 
     constructor(data: XModuleData) {
         this._name = data._name
         this._id = XUtils.guid()
-
+        this._object_manger = new XObjectManager(this._name)
 
     }
 
@@ -82,8 +82,8 @@ export class XModule {
 
         let xObject:any;
         if (data.hasOwnProperty("_type")) {
-            if (this.#_object_manger.hasObjectClass(<string>data["_type"])) {
-                let xObjectClass = this.#_object_manger.getObjectClass(<string>data["_type"]);
+            if (this._object_manger.hasObjectClass(<string>data["_type"])) {
+                let xObjectClass = this._object_manger.getObjectClass(<string>data["_type"]);
                 if (xObjectClass.hasOwnProperty("defaults")) {
                     XUtils.mergeDefaultsWithData(data, xObjectClass.defaults);
                 }
@@ -98,7 +98,7 @@ export class XModule {
         }
 
         //await spell_object.init();
-        this.#_object_manger.addObject(xObject)
+        this._object_manger.addObject(xObject)
         if (data._children) {
             // const sthis = this //strong "this" for anonymous function use
             data._children.forEach(async (spell) => {
@@ -115,9 +115,9 @@ export class XModule {
      * @param objectId op
      */
     remove(objectId:string) {
-        const obj:XObject = this.#_object_manger.getObject(objectId)
+        const obj:XObject = this._object_manger.getObject(objectId)
         if (obj) {
-            this.#_object_manger.removeObject(objectId)
+            this._object_manger.removeObject(objectId)
             if(obj["dispose"] && typeof obj.dispose === "function") {
                 (<XObject>obj).dispose()
             }
@@ -167,10 +167,10 @@ export class XModule {
         if (this[lop] && typeof this[lop] === 'function') {
             return this[lop](xCommand)
         }
-        else if (this.#_object_manger) //direct xpell injection to specific module
+        else if (this._object_manger) //direct xpell injection to specific module
         {
 
-            const o = this.#_object_manger.getObjectByName(xCommand._op)
+            const o = this._object_manger.getObjectByName(xCommand._op)
             if (o) { o.execute(xCommand) }
             else { throw "Xpell Module cant find op:" + xCommand._op }
         }
@@ -189,7 +189,7 @@ export class XModule {
      * @param frameNumber Current frame number
      */
     async onFrame(frameNumber: number) {
-        const omObjects = this.#_object_manger._objects
+        const omObjects = this._object_manger._objects
         Object.keys(omObjects).forEach(key => {
             const onFrameCallBack:XObject = <any>omObjects[key]
             if (onFrameCallBack && onFrameCallBack.onFrame && typeof onFrameCallBack.onFrame === 'function') {
@@ -210,16 +210,16 @@ export class XModule {
      * If you wish to get an object from the object manager use
      * getObject directly on the module instead of om.getObject 
      */
-    get om() { return this.#_object_manger }
-    get _object_manager() { return this.#_object_manger }
-
+    get om() { return this._object_manger }
+    _o(objectId:string) { return this.getObject(objectId) }
+    
     /**
      * Returns the XObject instance from the module Object Manager
      * @param objectId 
      * @returns XObject
      */
     getObject(objectId:string):XObject {
-        return this.#_object_manger.getObject(objectId)
+        return this._object_manger.getObject(objectId)
     }
 
     /**
@@ -228,7 +228,7 @@ export class XModule {
      * @param {XObjects} xObjectPack 
      */
     importObjectPack(xObjectPack: XObjectPack | any) {
-        this.#_object_manger.registerObjects(xObjectPack.getObjects())
+        this._object_manger.registerObjects(xObjectPack.getObjects())
     }
 
     /**
@@ -247,7 +247,7 @@ export class XModule {
      * @param xObject 
      */
     importObject(xObjectName:string, xObject:XObject) {
-        this.#_object_manger.registerObject(xObjectName, xObject)
+        this._object_manger.registerObject(xObjectName, xObject)
     }
 
 }

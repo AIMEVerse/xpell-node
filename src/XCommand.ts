@@ -1,13 +1,14 @@
-import XUtils from "./XUtils"
+
 
 
 
 export type XCommandData = {
-    _module: string  ,
-    _object?:string  ,
-    _op:string ,
+    _id?: string, // the command external id (optional)
+    _module: string , // the module to handle the command
+    _object?:string , // the object to handle the command (optional)
+    _op:string, // the operation to execute
     _params?: {
-        [k:string] : string | number | Function
+        [k:string] : any // the parameters to send to the operation
     },
 }
 
@@ -36,7 +37,7 @@ export  class XCommand {
     /**
      * command parameters array
      */
-    _params?: {
+    _params!: {
         [k:string] : string | number | Function
     }
 

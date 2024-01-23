@@ -111,3 +111,5 @@ public/
 
 #Aplle OSX files
 .DS_Store
+package-lock.json
+

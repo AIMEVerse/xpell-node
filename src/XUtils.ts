@@ -5,7 +5,11 @@
 //     declare function now()
 // }
 
-
+import fs from "fs"
+import path from "path"
+import {_xlog} from "./Xpell.js"
+import * as crypto from 'crypto'
+import { performance } from "perf_hooks"
 interface IXData {
     [k:string]: string | null | [] | undefined | Function | boolean | number | {}
 }
@@ -28,17 +32,18 @@ export class XUtils {
      * @returns {string} 
      */
     static guid() {
-        let chars = '0123456789abcdef'.split('');
-        let uuid:string[] = [], rnd = Math.random, r;
-        uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
-        uuid[14] = '4'; // version 4
-        for (let i = 0; i < 36; i++) {
-            if (!uuid[i]) {
-                r = 0 | rnd() * 16;
-                uuid[i] = chars[(i === 19) ? (r & 0x3) | 0x8 : r & 0xf];
-            }
-        }
-        return uuid.join('');
+        // let chars = '0123456789abcdef'.split('');
+        // let uuid:string[] = [], rnd = Math.random, r;
+        // uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
+        // uuid[14] = '4'; // version 4
+        // for (let i = 0; i < 36; i++) {
+        //     if (!uuid[i]) {
+        //         r = 0 | rnd() * 16;
+        //         uuid[i] = chars[(i === 19) ? (r & 0x3) | 0x8 : r & 0xf];
+        //     }
+        // }
+        // return uuid.join('');
+        return crypto.randomUUID()
     }
 
     /**
@@ -49,8 +54,12 @@ export class XUtils {
      */
     static mergeDefaultsWithData(data:IXData, defaults:IXData,force?:boolean) {
         if (data) {
-            if (!data["_id"]) {
-                if(!data["id"]) {defaults["_id"] = XUtils.guid()}
+            if (!data.hasOwnProperty("_id")) {
+                if(!data["id"]) {
+                    const guid = XUtils.guid().toString()
+                    // _xlog.debug(`XUtils.mergeDefaultsWithData: generated guid ${guid}`,defaults)
+                    defaults["_id"] = guid
+                }
                 else {defaults["_id"] = data["id"]}
             }
             //selective assign
@@ -74,7 +83,7 @@ export class XUtils {
      * @returns {string}
      */
     static encode(str:string) {
-        return btoa(encodeURIComponent(str));
+        return Buffer.from(encodeURIComponent(str)).toString('base64');
     }
 
     /**
@@ -83,7 +92,7 @@ export class XUtils {
      * @returns {string}
      */
     static decode( str:string ) {
-        return decodeURIComponent(atob(str));
+        return decodeURIComponent(Buffer.from(str, 'base64').toString());
     }
     
     /**
@@ -99,6 +108,51 @@ export class XUtils {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    static  addIfNotNull (source:any, target:any, key:any[]) {
+        for (const k of key) {
+            if (source[k]) target[k] = source[k]
+        }
+        
+    }
+
+
+    static mkDirByPathSync(targetDir:string,) {
+        const sep = path.sep;
+        const initDir = path.isAbsolute(targetDir) ? sep : '';
+        const baseDir =  '.';
+    
+        return targetDir.split(sep).reduce((parentDir, childDir) => {
+            const curDir = path.resolve(baseDir, parentDir, childDir);
+            try {
+                fs.mkdirSync(curDir);
+            } catch (err:any) {
+                if (err.code === 'EEXIST') { // curDir already exists!
+                    return curDir;
+                }
+    
+                // To avoid `EISDIR` error on Mac and `EACCES`-->`ENOENT` and `EPERM` on Windows.
+                if (err.code === 'ENOENT') { // Throw the original parentDir error on curDir `ENOENT` failure.
+                    throw new Error(`EACCES: permission denied, mkdir '${parentDir}'`);
+                }
+    
+                const caughtErr = ['EACCES', 'EPERM', 'EISDIR'].indexOf(err.code) > -1;
+                if (!caughtErr || caughtErr && curDir === path.resolve(targetDir)) {
+                    throw err; // Throw if it's just the last created dir.
+                }
+            }
+    
+            return curDir;
+        }, initDir);
+    }
+    
+    /**
+     * Checks if folders exists and creates them if not (supports nested folders)
+     * @param folders - folders to check (Array of strings)
+     */
+    static checkFolders(folders:string[]) {
+        folders.forEach(folder => XUtils.mkDirByPathSync(folder))
+        //there are no folders to check :]]
+    }
 }
 
 

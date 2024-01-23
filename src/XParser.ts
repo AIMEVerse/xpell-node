@@ -1,5 +1,5 @@
-import XCommand from "./XCommand"
-import * as _XC from "./XConst"
+import XCommand from "./XCommand.js"
+import * as _XC from "./XConst.js"
 
 /**
  * Xpell Parser - Parse XML, HTML, Raw Text & Json to Xpell Command
@@ -163,19 +163,7 @@ export class XParser {
     }
 
 
-    /**
-     * Converts XML/HTML string to XCommand
-     * @param xmlString XML string
-     * @returns 
-     */
-    static xmlString2Xpell(xmlString:string):{}   {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlString,"text/xml");
-        if(xmlDoc.childNodes.length>0) {
-            return XParser.xml2Xpell(xmlDoc.childNodes[0])
-        } else return {}
-  
-    }
+    
 
     /**
      * Converts XML/HTML Document to Xpell JSON

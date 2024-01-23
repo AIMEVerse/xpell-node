@@ -13,13 +13,14 @@
 
 
 /** interface */
-import XCommand from "./XCommand"
-import {XUtils,FPSCalc} from "./XUtils"
-import {XLogger as _xlog} from "./XLogger"
-import XData from "./XData"
-import XParser from "./XParser"
-import XModule from "./XModule"
-import {XEventManager as XEM} from  "./XEventManager"
+import {XCommand, XCommandData } from "./XCommand.js"
+import {XUtils,FPSCalc} from "./XUtils.js"
+import {XLogger as _xlog} from "./XLogger.js"
+import XData from "./XData.js"
+import XParser from "./XParser.js"
+import XModule from "./XModule.js"
+import {XEventManager as XEM} from  "./XEventManager.js"
+
 
 
 
@@ -53,9 +54,10 @@ export class XpellEngine {
     _engine_id: string
     _frame_number: number
     #fps_calc: FPSCalc
-
+    _fps: number = 1
     #_modules:{[name:string]:any} = {}
     parser: typeof XParser
+    private _interval: NodeJS.Timeout | undefined
    
     constructor() {
         this._version = "0.0.1"
@@ -127,7 +129,7 @@ export class XpellEngine {
      * Execute Xpell Command 
      * @param {XCommand} 
      */
-    execute(xcmd:XCommand):any {
+    execute(xcmd:XCommand | XCommandData):any {
         if(xcmd && xcmd._module && this.#_modules[xcmd._module]) {
             return this.#_modules[xcmd._module].execute(xcmd)
         } else {
@@ -141,7 +143,7 @@ export class XpellEngine {
      * Main onFrame method
      * calls all the sub-modules onFrame methods (if implemented)
      */
-     onFrame():void {     
+     async onFrame():Promise<void> {     
         this._frame_number++
         Object.keys(this.#_modules).forEach(mod => {
             if(this.#_modules[mod].onFrame && typeof this.#_modules[mod].onFrame === 'function') {
@@ -150,8 +152,12 @@ export class XpellEngine {
         })
         XData._o["frame-number"] = this._frame_number
         XData._o["fps"] = this.#fps_calc.calc()
+        // _xlog.log("Frame: " + this._frame_number + " FPS: " + XData._o["fps"])
+
+
         
-        requestAnimationFrame(() => {Xpell.onFrame()})         
+
+
     }
 
 
@@ -165,12 +171,21 @@ export class XpellEngine {
     }
 
     /**
-     * Start Xpell engine for web browsers using requestAnimationFrame
+     * Start Xpell engine for web browsers using setInterval
      */
     start() {
         _xlog.log("Starting Xpell")
-        this.onFrame()
+        this._interval = setInterval(()=>{Xpell.onFrame()},1000/this._fps)
     }
+
+    /**
+     * Stop Xpell engine
+     */
+    stop() {
+        clearInterval(this._interval)
+    }
+
+    
 
 }
 
@@ -181,3 +196,48 @@ export class XpellEngine {
 export const Xpell = new XpellEngine()
 
 export default Xpell
+
+
+
+/**
+ * Xpell - Real-Time User Interface Platform
+ * Typescript Edition
+ * Library Entry Point
+ * 
+ * @description Universal User Interface (UI) Engine for Javascript supporting devices & browsers
+ * @author Fridman Fridman <fridman.tamir@gmail.com>
+ * @since  22/07/2022
+ * @Copyright Fridman Tamir 2022, all right reserved
+ *
+ *      This program is free software; you can redistribute it and/or
+ *		modify it under the terms of the GNU General Public License
+ *		as published by the Free Software Foundation; either version
+ *		3 of the License, or (at your option) any later version.
+ *
+ */
+
+ export {Xpell as _x}
+ export {XUtils,XUtils as _xu} from "./XUtils.js"
+ export {XData,XData as _xd,type XDataObject,type XDataVariable,_XData} from "./XData.js"
+ export {XParser} from "./XParser.js"
+ export {XCommand,type XCommandData} from "./XCommand.js"
+ export {XLogger,XLogger as _xlog,_XLogger} from "./XLogger.js"
+ export {
+     XModule,
+     type XModuleData,
+     GenericModule
+ } from "./XModule.js"
+ export {
+     XObject,
+     XObjectPack,
+     type IXData,
+     type IXObjectData,
+     type XDataXporterHandler,
+     type XObjectData,
+     type XObjectOnEventIndex,
+     type XObjectOnEventHandler
+ } from "./XObject.js"
+ export {XObjectManager} from "./XObjectManager.js"
+ export {XEventManager, XEventManager as _xem,type XEventListener,type XEvent,type XEventListenerOptions,_XEventManager} from "./XEventManager.js"
+ export {type XNanoCommandPack,type XNanoCommand} from "./XNanoCommands.js"
+

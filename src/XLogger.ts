@@ -22,6 +22,8 @@ export class _XLogger  {
      */
     showTime:boolean = true
 
+    _debug:boolean = false
+
     constructor() {
     }
 
@@ -47,6 +49,14 @@ export class _XLogger  {
             var args = Array.prototype.slice.call(arguments);
             args.unshift(this.getLogDateTimeSignature());
             console.log.apply(console, args);
+        }
+    }
+
+    debug(message?: any, ...optionalParams: any[]) {
+        if (this._debug) {
+            var args = Array.prototype.slice.call(arguments);
+            args.unshift(this.getLogDateTimeSignature());
+            console.debug.apply(console, args);
         }
     }
 

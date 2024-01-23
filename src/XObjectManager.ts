@@ -1,7 +1,5 @@
-import { get } from "core-js/core/dict";
-import XEM from "./XEventManager"
-import XLogger from "./XLogger";
-import XObject, { XObjectPack } from "./XObject";
+import XLogger from "./XLogger.js";
+import XObject, { XObjectPack } from "./XObject.js";
 
 /**
  * Xpell Module Object Manager
@@ -14,29 +12,34 @@ export type XObjectManagerIndex = {
 }
 
 export class XObjectManager {
-    #_object_classes: XObjectManagerIndex
-    #_xobjects: XObjectManagerIndex
-    #_names_index: XObjectManagerIndex
-    constructor() {
+    _object_classes: XObjectManagerIndex
+    _xobjects: XObjectManagerIndex
+    _names_index: XObjectManagerIndex
+    constructor(moduleName?:string) {
         /**
          * Object Classes dictionary
          */
-        this.#_object_classes = {};
+        this._object_classes = {};
 
         /**
          * Live XObject that is being maintained by the Object Manager
          */
-        this.#_xobjects = {};
+        this._xobjects = {};
 
         /**
          * Object Names index - uses to get object by name
          */
-        this.#_names_index = {}
+        this._names_index = {}
+        if(moduleName) {
+            XLogger.log("Object Manager for  " + moduleName + " loaded")
+        } else {
+            XLogger.log("Object Manager loaded")
+        }
     }
 
 
     get _objects():XObjectManagerIndex{
-        return this.#_xobjects
+        return this._xobjects
     }
     
 
@@ -46,7 +49,7 @@ export class XObjectManager {
      * @returns 
      */
     hasObject(xObjectId:string):boolean {
-        return this.#_xobjects.hasOwnProperty(xObjectId)
+        return this._xobjects.hasOwnProperty(xObjectId)
     }
 
     /**
@@ -64,7 +67,8 @@ export class XObjectManager {
      * @param xObjects The object class
      */
     registerObject(name:string, xObjects:XObject) {
-        this.#_object_classes[name] = xObjects;
+        this._object_classes[name] = xObjects;
+
     }
 
     /**
@@ -73,7 +77,7 @@ export class XObjectManager {
      * @returns {boolean} 
      */
     hasObjectClass(name:string) {
-        return this.#_object_classes.hasOwnProperty(name);
+        return this._object_classes.hasOwnProperty(name);
     }
 
     /**
@@ -82,7 +86,7 @@ export class XObjectManager {
      * @returns {XObject}
      */
     getObjectClass(name:string) {
-        return this.#_object_classes[name];
+        return this._object_classes[name];
     }
 
     /**
@@ -90,11 +94,11 @@ export class XObjectManager {
      * @returns XObjectManagerIndex
      */
     getAllClasses():XObjectManagerIndex {
-        return this.#_object_classes
+        return this._object_classes
     }
 
     get _classes():XObjectManagerIndex {
-        return this.#_object_classes
+        return this._object_classes
     }
 
     /**
@@ -103,11 +107,11 @@ export class XObjectManager {
      */
     addObject(xObject:XObject) {
         if (xObject && xObject._id) {
-            this.#_xobjects[<string>xObject._id] = xObject
+            this._xobjects[<string>xObject._id] = xObject
             if (!xObject._name || (<string>xObject._name).length==0) {
                 xObject._name = xObject._id
             }
-            this.#_names_index[<string>xObject._name] = xObject._id
+            this._names_index[<string>xObject._name] = xObject._id
         }
         else {
             XLogger.log("unable to add object")
@@ -119,10 +123,10 @@ export class XObjectManager {
      * @param xObjectId object id to remove
      */
     removeObject(xObjectId:string) {
-        const obj = this.#_xobjects[xObjectId]
+        const obj = this._xobjects[xObjectId]
         if(obj) {
-            delete this.#_names_index[obj?.name] //= null
-            delete this.#_xobjects[xObjectId] //= null;
+            delete this._names_index[obj?.name] //= null
+            delete this._xobjects[xObjectId] //= null;
         }
     }
 
@@ -132,7 +136,7 @@ export class XObjectManager {
      * @returns {XObject}
      */
     getObject(xObjectId:string):XObject {
-        return this.#_xobjects[xObjectId]
+        return this._xobjects[xObjectId]
     }
 
     /**
@@ -151,8 +155,8 @@ export class XObjectManager {
      * @returns {XObject}
      */
     getObjectByName(objectName:string):XObject | null {
-        if(this.#_names_index[objectName]) {
-            return this.getObject(this.#_names_index[objectName])
+        if(this._names_index[objectName]) {
+            return this.getObject(this._names_index[objectName])
         } 
         return null
     }

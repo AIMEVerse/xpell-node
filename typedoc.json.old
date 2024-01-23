@@ -1,6 +1,0 @@
-{
-    "entryPoints": ["./src/*.ts"],
-    "exclude": [],
-    "out": "./docs",
-    "categorizeByGroup": false
-}
