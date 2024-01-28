@@ -26,13 +26,14 @@ The way to communicate with Xpell engine is to send XCommand that will be analyz
 
  ---
 
- Author: Fridman Fridman <tamirf@yahoo.com>
+ Author: Fridman Fridman <fridman.tamir@gmail.com>
+         
 
  License:  GPL-3 
 
- First Release: 22/07/2022
+ First Release: 02/01/2024
 
- Copyright Fridman Tamir 2022, all right reserved
+  Copyright Aime Technologies 2024, all right reserved
 
  
  
