@@ -240,4 +240,4 @@ export {
 export { XObjectManager } from "./XObjectManager.js"
 export { XEventManager, XEventManager as _xem, type XEventListener, type XEvent, type XEventListenerOptions, _XEventManager } from "./XEventManager.js"
 export { type XNanoCommandPack, type XNanoCommand } from "./XNanoCommands.js"
-export {Wormholes, type WormholeEvents} from "./Wormholes.js"
+export {Wormholes, WormholeEvents} from "./Wormholes.js"
