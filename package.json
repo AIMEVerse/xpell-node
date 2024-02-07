@@ -1,6 +1,6 @@
 {
   "name": "xpell-node",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Xpell Real-Time Interpreter for Node.js",
   "files": [
     "dist",
