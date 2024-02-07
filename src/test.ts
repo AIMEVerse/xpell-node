@@ -1,7 +1,8 @@
 
 
-import { XCommand, XCommandData, XModule, XObject, XObjectPack, _x, _xem, _xd, XObjectData } from "./Xpell"
-import { XModuleData, GenericModule as gm } from "./Xpell"
+import Wormholes, { WormholeEvents } from "./Wormholes.js"
+import { XCommand, XCommandData, XModule, XObject, XObjectPack, _x, _xem, _xd, XObjectData } from "./Xpell.js"
+import { XModuleData, GenericModule as gm } from "./Xpell.js"
 //display Xpell engine info
 _x.verbose()
 
@@ -58,9 +59,38 @@ const res = await _x.execute({
     }
 })
 
-console.log(res);
+// console.log(res);
 
 
+
+
+const wormholeUrl = "wss://japan.aimeverse.com/"
+const getEnvironmentNameMessage = {
+    _module: "xenvironment",
+    _op: "get-name"
+}
+
+
+
+const usetAuth = {
+    _module: "user-manager",
+    _op: "auth",
+    _params: {
+        email: "admin",
+        password: "admin"
+    }
+}
+
+
+
+_xem.on(WormholeEvents.WormholeOpen, async (data:any) => {
+    console.log("connection acquired")
+    
+    const res = await Wormholes.sendSync(getEnvironmentNameMessage,true)
+    console.log(res)
+})
+
+Wormholes.open(wormholeUrl)
 
 
 // gm.importObjectPack(XObjectPack)

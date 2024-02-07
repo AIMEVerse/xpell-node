@@ -13,12 +13,10 @@
   "main": "./dist/xpell.js",
   "module": "./dist/xpell.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "vite .",
+    "test": "tsc -p . && node ./dist/test.js",
     "docs": "typedoc --options ./typedoc.json --tsconfig ./",
     "types": "npx -p typescript tsc index.ts -t es2021 --declaration --allowJs --emitDeclarationOnly -moduleResolution node --outDir types",
-    "build": "tsc -p .",
-    "pub": "vite build && npm publish"
+    "build": "tsc -p ."
   },
   "author": "Tamir Fridman <fridman.tamir@gmail.com> (https://github.com/fridman-tamir)",
   "license": "GPL-3",
