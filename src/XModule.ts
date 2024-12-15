@@ -28,9 +28,9 @@ import XUtils from "./XUtils.js"
 import XParser from "./XParser.js"
 import { XLogger as _xl } from "./XLogger.js";
 import XObjectManager from "./XObjectManager.js";
-import * as _XC from "./XConst.js"
 import { XObjectData, XObject, XObjectPack } from "./XObject.js";
 import XCommand, { XCommandData } from "./XCommand.js";
+import { _x } from "./Xpell.js";
 
 
 
@@ -48,11 +48,14 @@ export class XModule {
     [k:string]:any
     _id: string
     _name: string;
+    _loaded: boolean = false
     _log_rules: {
+        load: boolean,
         createObject: boolean,
         removeObject: boolean,
 
     } = {
+            load: true,
             createObject: false,
             removeObject: false
         }
@@ -66,13 +69,14 @@ export class XModule {
         this._name = data._name
         this._id = XUtils.guid()
         this._object_manger = new XObjectManager(this._name)
-
     }
 
     load() {
-        _xl.log("Module " + this._name + " loaded")
+        if(this._log_rules.load) _xl.log("Module " + this._name + " loaded")
+        this._loaded = true
+        //add the module to xpell main interpreter
     }
-
+    
     /**
      * Creates new XObject from data object
      * @param data - The data of the new object (JSON)
@@ -84,16 +88,24 @@ export class XModule {
         if (data.hasOwnProperty("_type")) {
             if (this._object_manger.hasObjectClass(<string>data["_type"])) {
                 let xObjectClass = this._object_manger.getObjectClass(<string>data["_type"]);
+
                 if (xObjectClass.hasOwnProperty("defaults")) {
                     XUtils.mergeDefaultsWithData(data, xObjectClass.defaults);
                 }
+                // console.log("create objectasdasda ", xObjectClass)
+                // console.log("data", data);
+                
                 xObject = new xObjectClass(data);
+                
+                // console.log("xObject", xObject);
+                
             }
             else {
                 throw "Xpell object '" + data["_type"] + "' not found";
             }
         }
         else {
+            
             xObject = new XObject(data);
         }
 

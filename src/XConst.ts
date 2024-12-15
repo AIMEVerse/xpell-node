@@ -6,7 +6,7 @@
 /**
  * XObject json nodes
  */
- export const NODES = {
+export const NODES = {
     type: "_type", // xpell object type
     children: "_children", //child objects
     parent_element: "_parent_element"

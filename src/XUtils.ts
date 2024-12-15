@@ -7,19 +7,20 @@
 
 import fs from "fs"
 import path from "path"
-import {_xlog} from "./Xpell.js"
+import {XCommand, _xlog} from "./Xpell.js"
 import * as crypto from 'crypto'
-import { performance } from "perf_hooks"
+import { Buffer } from 'buffer';
+
 interface IXData {
     [k:string]: string | null | [] | undefined | Function | boolean | number | {}
 }
 
-export class XUtils {
+export class _XUtils {
     /**
      * create ignore list for parser to ignore spells words
      * @param list - list of reserved words (comma separated)
      */
-    static createIgnoreList(list:string,reservedWords:{}) {
+    createIgnoreList(list:string,reservedWords:{}) {
         let words = list.split(",");
         let outList:{[k:string]:string} = reservedWords;
         words.forEach(word => outList[word] = "");
@@ -31,7 +32,7 @@ export class XUtils {
      * Generates GUID (Globally unique Identifier)
      * @returns {string} 
      */
-    static guid() {
+    guid() {
         // let chars = '0123456789abcdef'.split('');
         // let uuid:string[] = [], rnd = Math.random, r;
         // uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
@@ -52,7 +53,7 @@ export class XUtils {
      * @param defaults - defaults object to merge with
      * @param force - add defaults values even if exists
      */
-    static mergeDefaultsWithData(data:IXData, defaults:IXData,force?:boolean) {
+    mergeDefaultsWithData(data:IXData, defaults:IXData,force?:boolean) {
         if (data) {
             if (!data.hasOwnProperty("_id")) {
                 if(!data["id"]) {
@@ -82,7 +83,7 @@ export class XUtils {
      * @param str string to encode
      * @returns {string}
      */
-    static encode(str:string) {
+    encode(str: string): string {
         return Buffer.from(encodeURIComponent(str)).toString('base64');
     }
 
@@ -91,7 +92,7 @@ export class XUtils {
      * @param str Base64 encoded string
      * @returns {string}
      */
-    static decode( str:string ) {
+    decode(str: string): string {
         return decodeURIComponent(Buffer.from(str, 'base64').toString());
     }
     
@@ -102,13 +103,13 @@ export class XUtils {
          * lower than max if max isn't an integer).
          * Using Math.round() will give you a non-uniform distribution!
          */
-    static getRandomInt(min:number, max:number) {
+    getRandomInt(min:number, max:number) {
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    static  addIfNotNull (source:any, target:any, key:any[]) {
+     addIfNotNull (source:any, target:any, key:any[]) {
         for (const k of key) {
             if (source[k]) target[k] = source[k]
         }
@@ -116,7 +117,7 @@ export class XUtils {
     }
 
 
-    static mkDirByPathSync(targetDir:string,) {
+    mkDirByPathSync(targetDir:string,) {
         const sep = path.sep;
         const initDir = path.isAbsolute(targetDir) ? sep : '';
         const baseDir =  '.';
@@ -149,9 +150,48 @@ export class XUtils {
      * Checks if folders exists and creates them if not (supports nested folders)
      * @param folders - folders to check (Array of strings)
      */
-    static checkFolders(folders:string[]) {
+    checkFolders(folders:string[]) {
         folders.forEach(folder => XUtils.mkDirByPathSync(folder))
         //there are no folders to check :]]
+    }
+
+    /**
+     * Extracts parameter from XCommand
+     * @param xcmd - XCommand object 
+     * @param paramName - The name of the parameter to extract
+     * @param defaultValue - Default value if parameter is not found
+     * @returns 
+     */
+     getParam (xcmd:XCommand, paramName:string,defaultValue:any = 0) {
+        return (xcmd._params && xcmd._params[paramName]) ? xcmd._params[paramName] : defaultValue
+    }
+
+    /**
+     * Add Last Slash
+     * @description adds a last slash to the url if it doesn't have one
+     * @param url 
+     * @returns 
+     */
+    als(url:string) {
+        return url.endsWith("/") ? url : url + "/"
+    }
+
+    /**
+     * Clear Last Slash
+     * @description shortens the url by removing the last slash
+     * @param url 
+     * @returns shortened url
+     */
+    cls(url:string) {
+        return url.endsWith("/") ? url.slice(0,-1) : url
+    }
+
+    afs(url:string) {
+        return url.startsWith("/") ? url : "/" + url
+    }
+
+    cfs(url:string) {
+        return url.endsWith("/") ? url.slice(0,-1) : url
     }
 }
 
@@ -174,7 +214,7 @@ export class FPSCalc  {
      */
     calc() {
         
-        const now:number = performance.now();
+        const now:number = Date.now();
         const diff:number = now-this.#lastTimestamp
         this.#lastTimestamp = now
         
@@ -188,5 +228,5 @@ export class FPSCalc  {
 
 }
 
-
+export const XUtils = new _XUtils()
 export default XUtils

@@ -54,10 +54,10 @@ export class XParser {
         
         if(carr.length>1){
             for (let i=2;i<carr.length;++i){
-                const v = carr[i]
+                const v = carr[i]                                
                 const dl = v.indexOf(":")
                 if(dl>-1){
-                    const mc = v.split(":")
+                    const mc = v.split(":")                    
                     rv._params[mc[0]] = mc[1]
                 }
                 else
@@ -94,7 +94,8 @@ export class XParser {
             let delimiterIdx = paramStr.indexOf(':');
             let quotesIdx = paramStr.indexOf('"');
             let finalDelimiter = (quotesIdx < delimiterIdx) ? -1 : delimiterIdx;
-
+            
+            
             let paramName = (finalDelimiter === -1) ? i.toString() : paramStr.substring(0, delimiterIdx);
             let paramValue = XParser.fixArgumentValue(paramStr.substring(finalDelimiter + 1));
 
@@ -162,7 +163,7 @@ export class XParser {
         return outputXpell
     }
 
-
+   
     
 
     /**
@@ -287,6 +288,8 @@ export class XParser {
 
         return idx;
     }
+
+
 }
 
 export default XParser

@@ -64,7 +64,7 @@ const res = await _x.execute({
 
 
 
-const wormholeUrl = "wss://japan.aimeverse.com/"
+const wormholeUrl = "ws://localhost:3030/"
 const getEnvironmentNameMessage = {
     _module: "xenvironment",
     _op: "get-name"

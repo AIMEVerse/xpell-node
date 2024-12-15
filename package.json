@@ -1,6 +1,6 @@
 {
   "name": "xpell-node",
-  "version": "0.0.15",
+  "version": "0.0.2",
   "description": "Xpell Real-Time Interpreter for Node.js",
   "files": [
     "dist",
@@ -13,10 +13,9 @@
   "main": "./dist/Xpell.js",
   "module": "./dist/Xpell.js",
   "scripts": {
-    "test": "tsc -p . && node ./dist/test.js",
-    "docs": "typedoc --options ./typedoc.json --tsconfig ./",
-    "types": "npx -p typescript tsc index.ts -t es2021 --declaration --allowJs --emitDeclarationOnly -moduleResolution node --outDir types",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "test": "npm run build && node ./dist/test.js",
+    "docs": "typedoc --options ./typedoc.json --tsconfig ./"
   },
   "author": "Tamir Fridman <tamir@aimeverse.com> (https://github.com/fridman-tamir)",
   "license": "GPL-3",
@@ -25,8 +24,10 @@
     "url": "git+https://github.com/fridman-tamir/Xpell-Core"
   },
   "devDependencies": {
-    "@types/core-js": "^2.5.5",
     "@types/node": "^14.18.36",
     "typescript": "^4.9.5"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

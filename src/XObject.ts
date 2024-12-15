@@ -8,7 +8,7 @@ import XParser from "./XParser.js"
 import { XLogger as _xlog } from "./XLogger.js";
 import { XEventListenerOptions, XEventManager as _xem } from "./XEventManager.js";
 import { _xobject_basic_nano_commands, XNanoCommandPack,XNanoCommand } from "./XNanoCommands.js";
-import _xd, { XDataObject } from "./XData.js";
+import _xd from "./XData.js";
 
 export interface IXData {
     [k: string]: string | null | [] | undefined | Function | boolean | number | {}
@@ -129,10 +129,14 @@ export class XObject  {
      * if override this method make sure to call super.init(data,skipParse) and to set skipParse to true
      */
     constructor(data: XObjectData, defaults?: any, skipParse?: boolean) {
+        
+
         if (defaults) {
             XUtils.mergeDefaultsWithData(data, defaults)
         }
 
+        
+        
         this._id = (data && data._id) ? data._id : "xo-" + XUtils.guid();
         this._type = "object" //default type
         this._children = []
@@ -157,7 +161,6 @@ export class XObject  {
             delete data._id // delete the _id field to remove duplication by the parse function
             this.parse(data, reservedWords);
             this.parseEvents(this._xem_options)
-
         }
     }
 
@@ -264,6 +267,7 @@ export class XObject  {
     async dispose() {
         this._process_data = false
         this._process_frame = false
+
         this.removeAllEventListeners()
         if(this._children) {
             this._children.forEach(child => {

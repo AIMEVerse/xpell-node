@@ -66,7 +66,7 @@ export class XObjectManager {
      * @param name - name of the object
      * @param xObjects The object class
      */
-    registerObject(name:string, xObjects:XObject) {
+    registerObject(name:string, xObjects:XObject) {        
         this._object_classes[name] = xObjects;
 
     }
@@ -160,6 +160,7 @@ export class XObjectManager {
         } 
         return null
     }
+
 }
 
 export default XObjectManager
